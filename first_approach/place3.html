@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>algo run </title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 60%;
+        width: 60%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <br>
+    <br>
+    <div id='print'></div>
+    <script>
+      var map;
+     
+      var set1 = new Set();
+
+      var lat1 = parseFloat(localStorage.getItem('lat1'));
+      var lat2 = parseFloat(localStorage.getItem('lat2'));
+      var lng1 = parseFloat(localStorage.getItem('lng1'));
+      var lng2 = parseFloat(localStorage.getItem('lng2'));
+      var entity = localStorage.getItem('entity');
+      var increment = parseFloat(localStorage.getItem('increment'));
+      function initMap() {
+
+  var place1 = new google.maps.LatLng(28.3381018,75.8628133);
+
+  map = new google.maps.Map(document.getElementById('map'), {
+      center: place1,
+      zoom: 15
+    });
+
+    
+
+    console.log('lat1 '+ lat1 +' entity ' + entity + ' increment ' + increment );
+
+    var i1, tempi, j1, tempj;
+
+    i1 = lat1;
+    j1 = lng1;
+
+    
+
+    for( i1 = lat1  ; i1 < lat2 ; i1=i1+increment  ){   
+        
+        for( j1=lng1   ; j1 < lng2 ; j1=j1+increment)
+            {
+                
+                tempi = i1+increment;
+                tempj = j1+increment;
+            if(tempi<lat2 && tempj<lng2){
+                var request = {
+                bounds: new google.maps.LatLngBounds (
+                new google.maps.LatLng (i1,j1),
+                new google.maps.LatLng (tempi,tempj)  
+                    ),
+                    query: `${entity}`
+                }
+                service = new google.maps.places.PlacesService(map);
+                service.textSearch(request, callback);
+            }
+
+            }
+    }
+
+
+  
+  
+}
+
+function callback(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      var place = results[i];
+      console.log(i + " -- " + results[i].name + " -- " + results[i].formatted_address);
+      set1.add(results[i].place_id)
+      
+
+    }
+  }
+
+
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKLXvtXF8oAq3wJSfAmqcDLM8yyVG9JkM&callback=initMap&libraries=places"
+    async defer></script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> coordinates takup </title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 60%;
+        width: 60%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <br>
+    <br>
+    <div id='print'></div>
+
+    <button onclick="redirect1()">results</button>
+
+
+    <script>
+      var map;
+      
+      var lat1 , lat2 , lng1 , lng2 ; 
+      var entity = localStorage.getItem('entity');
+      var place = localStorage.getItem('place');
+      var increment = localStorage.getItem('increment');
+      function initMap() {
+
+    var place1 = new google.maps.LatLng(28.3381018,75.8628133);
+
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: place1,
+      zoom: 15
+    });
+
+
+       var request = {
+        query: `${place}`,
+        fields: ['name', 'geometry'],
+        };
+
+        var service = new google.maps.places.PlacesService(map);
+
+
+    service.findPlaceFromQuery(request, function(results, status) {
+    if (status === google.maps.places.PlacesServiceStatus.OK) {
+      for (var i = 0; i < results.length; i++) {
+        console.log(results[i].geometry.viewport.na.j);
+        lat1 = results[i].geometry.viewport.na.j;
+        lat2 = results[i].geometry.viewport.na.l;
+        lng1 = results[i].geometry.viewport.ga.j;
+        lng2 = results[i].geometry.viewport.ga.l;
+
+        console.log('lat 1 = ' + lat1);
+        console.log('lat 2 = ' + lat2);
+        console.log('lng 1 = ' + lng1);
+        console.log('lng 2 = ' + lng2);
+        
+      }
+    }
+    });
+  
+  
+  
+}
+
+
+function redirect1(){
+        console.log('now redirect')
+
+        localStorage.setItem('lat1',lat1);
+        localStorage.setItem('lat2',lat2);
+        localStorage.setItem('lng1',lng1);
+        localStorage.setItem('lng2',lng2);
+        localStorage.setItem('entity',entity);
+        localStorage.setItem('place',place);
+        localStorage.setItem('increment', increment);
+
+        window.open("place3.html");
+}
+        
+        
+
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKLXvtXF8oAq3wJSfAmqcDLM8yyVG9JkM&callback=initMap&libraries=places"
+    async defer></script>
+  </body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>algo run </title>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+    #map {
+      height: 60%;
+      width: 60%;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <br>
+  <br>
+  <div id='print'></div>
+  <script>
+    var map;
+    var placeMap = new Map();
+    var placeIdSet = new Set();
+
+    // Latitude diff = 0.95062
+    // Longitude diff = 1.4470103
+
+    var north = 34;
+    var south = 32;
+    var east = 79;
+    var west = 74.5;
+    var entity = "Jain";
+    // var increment = 0.1;
+    var increment = 0.06;
+    // var increment = 0.03;
+
+    var resultCount = 0;
+    function initMap() {
+      var place1 = new google.maps.LatLng(25.4283062, 74.7805192);
+      console.log("increment: " + increment);
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: place1,
+        zoom: 15
+      });
+
+      var i1, tempi, j1, tempj;
+      var count = 0;
+      for (i1 = south; i1 < north; i1 = i1 + increment) {
+        for (j1 = west; j1 < east; j1 = j1 + increment) {
+          count = count + 1;
+          (function (i1, j1, count) {
+            setTimeout(function () {
+              // console.log(i1, j1, tempi, tempj)
+              var request = {
+                bounds: new google.maps.LatLngBounds(
+                  new google.maps.LatLng(i1, j1),
+                  new google.maps.LatLng(i1 + increment, j1 + increment)
+                ),
+                query: `${entity}`
+              }
+              console.log('invoking call count : ' + count + ', lat:' + i1 + ', long:' + j1);
+              service = new google.maps.places.PlacesService(map);
+              service.textSearch(request, callback)
+            }, 500 * count);
+          })(i1, j1, count);
+        }
+      }
+    }
+
+    function callback(results, status, pagination) {
+      resultCount = resultCount + 1;
+      if (status == google.maps.places.PlacesServiceStatus.OK) {
+        console.log('result size : ' + results.length, "resultCount : " + resultCount);
+        console.log('pagination : ' + JSON.stringify(pagination));
+        if(results.length == 20) {
+          console.log('Last result: ' + results[19].place_id);
+        }
+
+        for (var i = 0; i < results.length; i++) {
+          placeMap.set(results[i].place_id, results[i]);
+        }
+
+        if (pagination.hasNextPage) {
+          sleep: 2;
+          pagination.nextPage();
+        } else if(results.length == 20){
+          console.log('Reached max limit. Last result: ' + results[19].place_id);
+        }
+      } else {
+        console.log('Not Ok');
+      }
+    }
+
+    // console.log(JSON.stringify(Array.from(placeMap.entries())));
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCsDgaFZY000Uz2BHpx0aC0bbny5Gg2y1E&callback=initMap&libraries=places"
+    async defer></script>
+</body>
+
+</html>
